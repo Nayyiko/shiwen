@@ -9,7 +9,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 服务器在国内直连 GitHub 超时，不能依赖服务器 git pull。
+      # 改为：runner 在境外正常拉代码 → git archive 打包 → scp 推送到服务器。
+      - name: Package source
+        run: git archive --format=tar.gz --output=shiwen.tar.gz HEAD
+
+      - name: Upload tarball to ECS
+        env:
+          ECS_HOST: ${{ secrets.ECS_HOST }}
+          ECS_USER: ${{ secrets.ECS_USER }}
+          ECS_SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$ECS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "$ECS_USER@$ECS_HOST" "mkdir -p /opt/shiwen"
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            shiwen.tar.gz "$ECS_USER@$ECS_HOST:/opt/shiwen/shiwen.tar.gz"
+
+      - name: Deploy on server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.ECS_HOST }}
@@ -17,6 +38,8 @@ jobs:
           key: ${{ secrets.ECS_SSH_KEY }}
           script: |
             cd /opt/shiwen
-            git pull origin main
+            # .env 被 gitignore，tar 包里没有，首次部署自动从示例生成（S0 占位无需真实密钥）
+            [ -f .env ] || cp .env.example .env
+            tar -xzf shiwen.tar.gz
             docker compose up -d --build
             docker compose ps
