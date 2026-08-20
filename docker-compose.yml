@@ -36,9 +36,11 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+    # 宿主机 8090 → 容器 80（nginx.conf 内仍 listen 80）。
+    # 服务器 80/8080 已被其他正式服务占用，识文新裁独立占 8090，不与其冲突。
     ports:
-      - "80:80"
-      # - "443:443"   # HTTPS 证书后置
+      - "8090:80"
+      # - "8443:443"  # HTTPS 证书后置（暂未启用）
     depends_on:
       - backend
     restart: unless-stopped

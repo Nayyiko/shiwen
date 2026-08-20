@@ -48,9 +48,9 @@ cp .env.example .env        # 填入 DeepSeek API Key 等真实值
 # 2. 启动（首次会构建镜像）
 docker compose up -d --build
 
-# 3. 验证
-curl http://localhost/health          # {"status":"ok"}
-curl -X POST http://localhost/api/chat -H "Content-Type: application/json" -d '{"query":"学而时习之"}'
+# 3. 验证（nginx 对外端口为 8090）
+curl http://localhost:8090/health          # {"status":"ok"}
+curl -X POST http://localhost:8090/api/chat -H "Content-Type: application/json" -d '{"query":"学而时习之"}'
 ```
 
 后端开发（不经过 Docker）：
@@ -79,7 +79,9 @@ cp .env.example .env        # 填入真实密钥
 docker compose up -d --build
 ```
 
-> 安全组仅开放 80/443；backend 不映射公网端口，由 nginx 反代。
+> 识文新裁对外端口为 **8090**（服务器 80/8080 已被其他正式服务占用，独立端口共存）。
+> 安全组仅开放 **8090**；backend 不映射公网端口，由 nginx 反代。
+> 访问地址：`http://<ECS公网IP>:8090`（前端页 + `/api/chat`）
 
 ### CI/CD 自动部署
 

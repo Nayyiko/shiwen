@@ -25,5 +25,5 @@ fi
 echo "==> 4. 构建并启动（前端由多阶段 Dockerfile 构建，服务器无需装 Node）"
 docker compose up -d --build
 
-echo "==> 5. 状态"
+echo "==> 5. 状态（访问 http://<公网IP>:8090）"
 docker compose ps
