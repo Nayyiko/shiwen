@@ -1,0 +1,27 @@
+[project]
+name = "shiwen"
+version = "0.1.0"
+description = "识文新裁 — 古籍数字化 AI 平台（LangGraph 图工程 + RAG + Multi-Agent）"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+# S1 起逐步加入：langgraph、pymilvus、sentence-transformers、jieba、rank_bm25、fastmcp 等
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

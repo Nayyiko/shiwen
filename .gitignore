@@ -1,0 +1,36 @@
+# ===== 环境与密钥（切勿提交）=====
+.env
+.env.*
+!.env.example
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== 数据（大语料不进 git，仅保留占位）=====
+data/corpus/*
+!data/corpus/.gitkeep
+data/milvus.db
+data/*.db
+
+# ===== 评测产物（由评测脚本生成）=====
+eval/report.md
+
+# ===== 前端 =====
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ===== IDE / OS =====
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
