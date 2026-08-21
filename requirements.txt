@@ -3,3 +3,13 @@ uvicorn[standard]>=0.29
 pydantic>=2.6
 pydantic-settings>=2.2
 python-dotenv>=1.0
+
+# S1 语料 + Ingestion 管线
+requests>=2.31
+pyyaml>=6.0
+jieba>=0.42
+rank_bm25>=0.2.1
+sqlalchemy>=2.0
+psycopg[binary]>=3.1
+pymilvus[milvus_lite]>=2.4.3
+sentence-transformers>=2.7

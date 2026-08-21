@@ -1,0 +1,151 @@
+# 识文新裁 语料清单（单一数据源）
+# 扩展古籍只需在此增删一行 books 条目，代码无需改动。
+#
+# 许可说明：
+#   - 原文皆为公版（公有领域）；
+#   - 转写 JSON 取自 Guopop/chinese-philosophy（CText 镜像），该仓库未标注许可，
+#     仅用于学术研究与演示，切勿商用。
+#
+# 字段说明：
+#   id       —— 英文短标识（入库主键、chunk id 前缀）
+#   name     —— 书名
+#   author   —— 权威作者标注（覆盖 raw JSON 中的错误标注，如论语被误标「战国」）
+#   dynasty  —— 成书朝代
+#   category —— 四部分类（经部/子部/史部/集部）
+#   file     —— 相对 source_base 的路径
+#   max_chars / overlap —— 分块参数（可覆盖 defaults）
+
+source_base: "https://raw.githubusercontent.com/Guopop/chinese-philosophy/main/back/new"
+
+defaults:
+  max_chars: 500
+  overlap: 80
+
+books:
+  # ===== 经部 =====
+  - id: lunyu
+    name: 论语
+    author: 孔子及其弟子
+    dynasty: 春秋
+    category: 经部
+    file: 儒家/论语.json
+  - id: mengzi
+    name: 孟子
+    author: 孟子及其弟子
+    dynasty: 战国
+    category: 经部
+    file: 儒家/孟子.json
+  - id: daxue
+    name: 大学
+    author: 曾子（传）
+    dynasty: 战国
+    category: 经部
+    file: 儒家/大学.json
+  - id: zhongyong
+    name: 中庸
+    author: 子思（传）
+    dynasty: 战国
+    category: 经部
+    file: 儒家/中庸.json
+  - id: xiaojing
+    name: 孝经
+    author: 曾子（传）
+    dynasty: 战国
+    category: 经部
+    file: 儒家/孝经.json
+  - id: shijing
+    name: 诗经
+    author: 佚名（孔子编订）
+    dynasty: 先秦
+    category: 经部
+    file: 文学/诗经.json
+  - id: shangshu
+    name: 尚书
+    author: 佚名
+    dynasty: 先秦
+    category: 经部
+    file: 儒家/尚书.json
+  - id: zhouyi
+    name: 周易
+    author: 佚名
+    dynasty: 先秦
+    category: 经部
+    file: 文学/周易.json
+  - id: liji
+    name: 礼记
+    author: 戴圣编
+    dynasty: 西汉
+    category: 经部
+    file: 儒家/礼记.json
+
+  # ===== 子部 =====
+  - id: daodejing
+    name: 道德经
+    author: 老子
+    dynasty: 春秋
+    category: 子部
+    file: 道家/道德经.json
+  - id: zhuangzi
+    name: 庄子
+    author: 庄子及其后学
+    dynasty: 战国
+    category: 子部
+    file: 道家/庄子.json
+  - id: liezi
+    name: 列子
+    author: 列御寇（传）
+    dynasty: 战国
+    category: 子部
+    file: 道家/列子.json
+  - id: xunzi
+    name: 荀子
+    author: 荀况
+    dynasty: 战国
+    category: 子部
+    file: 儒家/荀子.json
+  - id: hanfeizi
+    name: 韩非子
+    author: 韩非
+    dynasty: 战国
+    category: 子部
+    file: 法家/韩非子.json
+  - id: mozi
+    name: 墨子
+    author: 墨翟及其后学
+    dynasty: 战国
+    category: 子部
+    file: 杂家/墨子.json
+  - id: sunzi
+    name: 孙子兵法
+    author: 孙武
+    dynasty: 春秋
+    category: 子部
+    file: 兵家/孙子兵法.json
+  - id: guiguzi
+    name: 鬼谷子
+    author: 鬼谷子（传）
+    dynasty: 战国
+    category: 子部
+    file: 杂家/鬼谷子.json
+
+  # ===== 史部 =====
+  - id: shiji
+    name: 史记
+    author: 司马迁
+    dynasty: 西汉
+    category: 史部
+    file: 史书/史记.json
+  - id: zuozhuan
+    name: 春秋左传
+    author: 左丘明（传）
+    dynasty: 春秋
+    category: 史部
+    file: 史书/春秋左传.json
+
+  # ===== 集部 =====
+  - id: chuci
+    name: 楚辞
+    author: 屈原等
+    dynasty: 战国
+    category: 集部
+    file: 文学/楚辞.json

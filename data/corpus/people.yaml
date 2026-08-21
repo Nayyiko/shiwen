@@ -1,0 +1,148 @@
+# 人物关系表 手工维护数据（seed 进 PostgreSQL）
+# relation 方向：person_id --relation--> target_person_id
+# 如「颜回 --师从--> 孔子」读作「颜回师从孔子」。
+
+people:
+  - id: kongzi
+    name: 孔子
+    courtesy: 仲尼
+    dynasty: 春秋
+    school: 儒家
+    notes: 儒家学派创始人
+    works:
+      - { title: 论语, relation: 著, note: 弟子及再传弟子编纂（述而不作） }
+      - { title: 春秋, relation: 修, note: 据鲁史修订 }
+      - { title: 周易, relation: 传, note: 十翼相传为孔子所作 }
+
+  - id: yanhui
+    name: 颜回
+    courtesy: 子渊
+    dynasty: 春秋
+    school: 儒家
+    notes: 孔子最得意门生，位列七十二贤之首
+    relations:
+      - { target: kongzi, relation: 师从 }
+
+  - id: zengzi
+    name: 曾子
+    courtesy: 子舆
+    dynasty: 春秋
+    school: 儒家
+    works:
+      - { title: 大学, relation: 传, note: 相传为曾子所作 }
+      - { title: 孝经, relation: 传, note: 相传为曾子所作 }
+    relations:
+      - { target: kongzi, relation: 师从 }
+
+  - id: zisi
+    name: 子思
+    courtesy: 孔伋
+    dynasty: 战国
+    school: 儒家
+    notes: 孔子之孙
+    works:
+      - { title: 中庸, relation: 传, note: 相传为子思所作 }
+    relations:
+      - { target: kongzi, relation: 祖孙, note: 孔子之孙 }
+      - { target: zengzi, relation: 师从 }
+
+  - id: mengzi
+    name: 孟子
+    courtesy: 子舆
+    dynasty: 战国
+    school: 儒家
+    notes: 亚圣
+    works:
+      - { title: 孟子, relation: 著 }
+    relations:
+      - { target: kongzi, relation: 私淑 }
+      - { target: zisi, relation: 私淑, note: 孟子私淑子思之门 }
+
+  - id: xunzi
+    name: 荀子
+    courtesy: 卿
+    dynasty: 战国
+    school: 儒家
+    notes: 隆礼重法，韩非、李斯之师
+    works:
+      - { title: 荀子, relation: 著 }
+
+  - id: laozi
+    name: 老子
+    courtesy: 李耳
+    dynasty: 春秋
+    school: 道家
+    notes: 道家学派创始人
+    works:
+      - { title: 道德经, relation: 著 }
+
+  - id: zhuangzi
+    name: 庄子
+    courtesy: 周
+    dynasty: 战国
+    school: 道家
+    works:
+      - { title: 庄子, relation: 著, note: 内篇为庄子所作，外杂篇多出后学 }
+    relations:
+      - { target: laozi, relation: 私淑, note: 庄学承老子 }
+
+  - id: liezi
+    name: 列子
+    courtesy: 御寇
+    dynasty: 战国
+    school: 道家
+    works:
+      - { title: 列子, relation: 著, note: 今本或经后人整理 }
+
+  - id: hanfei
+    name: 韩非
+    courtesy: 韩非
+    dynasty: 战国
+    school: 法家
+    notes: 法家集大成者
+    works:
+      - { title: 韩非子, relation: 著 }
+    relations:
+      - { target: xunzi, relation: 师从 }
+
+  - id: mozi
+    name: 墨子
+    courtesy: 翟
+    dynasty: 战国
+    school: 墨家
+    notes: 墨家学派创始人
+    works:
+      - { title: 墨子, relation: 著, note: 墨翟及其后学 }
+
+  - id: sunwu
+    name: 孙武
+    courtesy: 长卿
+    dynasty: 春秋
+    school: 兵家
+    notes: 兵家至圣
+    works:
+      - { title: 孙子兵法, relation: 著 }
+
+  - id: simaqian
+    name: 司马迁
+    courtesy: 子长
+    dynasty: 西汉
+    school: 史家
+    works:
+      - { title: 史记, relation: 著 }
+
+  - id: zuoqiuming
+    name: 左丘明
+    courtesy: 左丘明
+    dynasty: 春秋
+    school: 史家
+    works:
+      - { title: 春秋左传, relation: 传, note: 相传为左丘明所作 }
+
+  - id: quyuan
+    name: 屈原
+    courtesy: 灵均
+    dynasty: 战国
+    school: 楚辞
+    works:
+      - { title: 楚辞, relation: 著, note: 屈原及宋玉等楚辞体作品汇编 }

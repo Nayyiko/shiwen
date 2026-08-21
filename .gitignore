@@ -18,6 +18,9 @@ dist/
 # ===== 数据（大语料不进 git，仅保留占位）=====
 data/corpus/*
 !data/corpus/.gitkeep
+# 语料清单与人物关系表进 git（注意：gitignore 否定行不能带行内注释）
+!data/corpus/manifest.yaml
+!data/corpus/people.yaml
 data/milvus.db
 data/*.db
 

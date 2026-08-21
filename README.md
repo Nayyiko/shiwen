@@ -67,6 +67,30 @@ uvicorn src.shiwen.api.main:app --reload            # 访问 http://localhost:80
 cd frontend && npm install && npm run dev
 ```
 
+## 语料与 Ingestion（S1）
+
+语料为公版古籍白文，转写 JSON 取自 [Guopop/chinese-philosophy](https://github.com/Guopop/chinese-philosophy)（CText 镜像，**许可未标注，仅研究/演示用，切勿商用**）。清单集中在 `data/corpus/manifest.yaml` —— 扩展古籍只需增删一行，代码无需改动。默认收录 **20 部**（经史子集：论语/孟子/道德经/庄子/荀子/韩非子/孙子兵法/史记/楚辞等）。
+
+入库全流程在 **Docker backend 容器**内执行（绕开 milvus-lite 的 Windows 兼容问题、不占服务器资源）：
+
+```bash
+# 首次需构建镜像（拉 BGE-M3 权重约 2GB，缓存于 hf_cache 卷）
+docker compose build
+
+# 一键全流程：下载 → 规范化 → 切分 → 向量化 → 入库 → 灌人物表 → golden 自检
+bash scripts/reindex.sh
+
+# 或分步执行（国内下载可加 --mirror ghfast；HF_ENDPOINT 默认走 hf-mirror）
+docker compose run --rm backend python -m src.shiwen.ingest download --mirror ghfast
+docker compose run --rm backend python -m src.shiwen.ingest normalize
+docker compose run --rm backend python -m src.shiwen.ingest reindex      # 全量入库 Milvus + PG
+docker compose run --rm backend python -m src.shiwen.ingest seed-people  # 灌人物关系表
+docker compose run --rm backend python -m src.shiwen.ingest verify       # 3/3 golden 通过
+docker compose run --rm backend python -m src.shiwen.ingest inspect --book lunyu
+```
+
+数据落点：Milvus Lite（`data/milvus.db`）+ PostgreSQL（`chunk` 表 + `person/person_work/person_relation` 人物关系三表），人物关系满足「孔子-著-论语」等查询。切分为结构感知（卷/篇/章），篇是引据原子单位；chunk 永不跨章。
+
 ## 阿里云部署（ECS + Docker Compose）
 
 ### 首次部署
@@ -98,7 +122,7 @@ gh secret set ECS_SSH_KEY -b"$(cat ~/.ssh/id_rsa)"
 ## 阶段进度
 
 - [x] S0 环境 / 建仓 / docker-compose / CI/CD
-- [ ] S1 语料 + Ingestion（含人物关系表）
+- [x] S1 语料 + Ingestion（含人物关系表）
 - [ ] S2 检索单跳
 - [ ] S3 多跳闭环 + 自我反思
 - [ ] S4 先贤辩论

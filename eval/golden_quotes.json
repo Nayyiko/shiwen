@@ -1,0 +1,7 @@
+{
+  "quotes": [
+    { "text": "学而时习之，不亦说乎", "book_id": "lunyu", "chapter_prefix": "学而篇" },
+    { "text": "道可道，非常道", "book_id": "daodejing", "chapter_prefix": "第一章" },
+    { "text": "知彼知己，百战不殆", "book_id": "sunzi", "chapter_prefix": "谋攻" }
+  ]
+}

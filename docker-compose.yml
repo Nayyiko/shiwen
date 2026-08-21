@@ -5,6 +5,8 @@ services:
       - .env
     volumes:
       - ./data:/app/data
+      # 缓存 BGE-M3 模型权重（约 2GB），避免每次重建镜像重下
+      - hf_cache:/root/.cache/huggingface
     depends_on:
       postgres:
         condition: service_healthy
@@ -47,3 +49,4 @@ services:
 
 volumes:
   pgdata:
+  hf_cache:

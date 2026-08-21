@@ -30,8 +30,15 @@ class Settings(BaseSettings):
     postgres_password: str = "change-me"
     postgres_db: str = "shiwen"
 
-    # Milvus Lite（进程内文件模式）
+    # Milvus Lite（进程内文件模式，本地默认）
     milvus_db_path: str = "data/milvus.db"
+    # 可选：覆盖为 standalone Milvus 地址（如 http://host:19530），未来换真 Milvus 只改配置不改代码
+    milvus_uri: str = ""
+
+    # 语料下载 base URL（可选，覆盖 manifest source_base；国内可配镜像）
+    corpus_raw_base: str = ""
+    # HuggingFace 镜像端点（国内下载 BGE-M3 权重用，如 https://hf-mirror.com）
+    hf_endpoint: str = ""
 
 
 @lru_cache
