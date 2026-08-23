@@ -212,7 +212,10 @@ def evaluate(limit: int | None = None, resume: bool = False) -> dict:
 
     # 指标一律从 results 聚合（断点续跑时计数器只覆盖新批，不能用）
     n = len(results)
-    n_citation = sum(1 for q in questions if q.get("golden_chapter"))
+    results_by_id = {r["id"]: r for r in results}
+    # 引据合规分母：只统计带 golden_chapter 的题（开放性知识题无单一篇目出处，不适用此指标）
+    cite_targets = [q["id"] for q in questions if q.get("golden_chapter")]
+    n_citation = len(cite_targets)
     recall_hits = sum(1 for r in results if r["recall"])
     mrr_sum = sum((1.0 / r["mrr_rank"]) if r["mrr_rank"] else 0 for r in results)
     cite_ok = sum(1 for r in results if r["citation_ok"])
@@ -220,11 +223,23 @@ def evaluate(limit: int | None = None, resume: bool = False) -> dict:
     ground_pass = sum(1 for r in results if r["grounding_pass"])
     elapsed_total = sum(r["elapsed_s"] for r in results)
 
+    # 按题型的引据合规（分子分母都用带 golden_chapter 的题）
+    cite_by_type: dict[str, tuple[int, int]] = {}
+    for q in questions:
+        if q.get("golden_chapter"):
+            t = q["type"]
+            ok = 1 if results_by_id.get(q["id"], {}).get("citation_ok") else 0
+            cur = cite_by_type.get(t, (0, 0))
+            cite_by_type[t] = (cur[0] + ok, cur[1] + 1)
+
     metrics = {
         "total_questions": n,
         "recall_at_5": round(recall_hits / n, 4) if n else 0,
         "mrr": round(mrr_sum / n, 4) if n else 0,
+        "citation_numerator": cite_ok,
+        "citation_denominator": n_citation,
         "citation_compliance": round(cite_ok / n_citation, 4) if n_citation else 0,
+        "citation_by_type": cite_by_type,
         "faithfulness_avg": round(faith_sum / n, 2) if n else 0,
         "grounding_pass_rate": round(ground_pass / n, 4) if n else 0,
         "avg_rounds": round(sum(r["rounds"] for r in results) / n, 2) if n else 0,
@@ -250,11 +265,26 @@ def write_report(report: dict, path: str = "eval/report.md") -> None:
         "|---|---|---|",
         f"| **Recall@5** | {m['recall_at_5']:.2%} | golden 书出现在 Top-5 检索结果中的比例 |",
         f"| **MRR** | {m['mrr']:.4f} | golden 书的平均倒数排名 |",
-        f"| **引据合规率** | {m['citation_compliance']:.2%} | 检索结果中 golden 书·篇同时命中的比例 |",
+        f"| **引据合规率** | {m['citation_numerator']}/{m['citation_denominator']} = {m['citation_compliance']:.2%} | golden 书·篇同时命中；分母=带 golden_chapter 的题（开放性知识题无单一篇目出处，不计入） |",
         f"| **Faithfulness 均分** | {m['faithfulness_avg']}/5 | LLM-as-judge 忠实度评分均值 |",
         f"| **Grounding 通过率** | {m['grounding_pass_rate']:.2%} | grounding 校验通过的比例 |",
         f"| **平均检索轮数** | {m['avg_rounds']} | 多跳收敛所需平均轮数 |",
         f"| **平均延迟** | {m['avg_elapsed_s']}s | 端到端平均耗时 |",
+        "",
+        "### 引据合规率（按题型，分母=带 golden_chapter 的题）",
+        "",
+        "| 题型 | 合规 | 值 |",
+        "|---|---|---|",
+    ]
+
+    for t in ["考据", "翻译", "知识"]:
+        if t in m["citation_by_type"]:
+            ok, tot = m["citation_by_type"][t]
+            rate = f"{ok}/{tot} = {ok/tot:.0%}" if tot else "-"
+            lines.append(f"| {t} | {rate} | "
+                         f"{'全部合规' if ok == tot else f'失败 {tot - ok} 题'} |")
+
+    lines += [
         "",
         "## 各题详情",
         "",
@@ -305,7 +335,8 @@ def main() -> None:
     print(f"\n[eval] 完成：")
     print(f"  Recall@5       = {m['recall_at_5']:.2%}")
     print(f"  MRR            = {m['mrr']:.4f}")
-    print(f"  引据合规率     = {m['citation_compliance']:.2%}")
+    print(f"  引据合规率     = {m['citation_numerator']}/{m['citation_denominator']} = {m['citation_compliance']:.2%}"
+          f"（分母=带 golden_chapter 的 {m['citation_denominator']} 题）")
     print(f"  Faithfulness   = {m['faithfulness_avg']}/5")
     print(f"  Grounding      = {m['grounding_pass_rate']:.2%}")
     print(f"  平均轮数       = {m['avg_rounds']}")
