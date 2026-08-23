@@ -18,6 +18,7 @@ from .bm25_store import search as bm25_search
 from .fusion import rrf_fuse
 from .generator import generate
 from .grounding import check_grounding, reflect
+from .query_cleaner import clean_query
 from .retriever import RetrievedChunk, retrieve as vector_retrieve
 
 
@@ -49,7 +50,8 @@ def _retrieve_node(state: RAGState) -> dict:
     元数据过滤（book_id/category）同时作用于向量和 BM25 两路。
     """
     t0 = time.time()
-    query = _effective_query(state)
+    # 清洗后的 query 用于检索：剥掉考据/翻译题的提问套话，突出名句内核
+    query = clean_query(_effective_query(state))
     book_id = state.get("book_id")
     category = state.get("category")
 

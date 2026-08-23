@@ -26,6 +26,7 @@ data/*.db
 
 # ===== 评测产物（由评测脚本生成）=====
 eval/report.md
+eval/results.json
 
 # ===== 前端 =====
 node_modules/

@@ -26,6 +26,15 @@ def _chunk_row_to_dict(row: ChunkRow) -> dict:
     }
 
 
+def _tokens(text: str) -> list[str]:
+    """jieba 词 + 字符二元组。
+
+    古籍检索里成语/惯用语（庄周梦蝶、守株待兔）与原文（胡蝶、守株）词形
+    常不一致，纯 jieba 词会零命中；补字符二元组后 庄周/守株 等重叠即可命中。
+    """
+    return list(jieba.cut(text)) + [text[i:i + 2] for i in range(len(text) - 1)]
+
+
 def _ensure_index() -> None:
     global _INDEX, _CHUNKS
     if _INDEX is not None:
@@ -35,7 +44,7 @@ def _ensure_index() -> None:
     with Session(engine) as session:
         rows = session.query(ChunkRow).all()
     _CHUNKS = [_chunk_row_to_dict(r) for r in rows]
-    corpus = [list(jieba.cut(c["text"])) for c in _CHUNKS]
+    corpus = [_tokens(c["text"]) for c in _CHUNKS]
     _INDEX = BM25Okapi(corpus)
 
 
@@ -54,7 +63,7 @@ def search(query: str, top_k: int = 20, book_id: str | None = None,
         [{"id": ..., "text": ..., "score": ..., "book_id": ..., ...}, ...]
     """
     _ensure_index()
-    tokens = list(jieba.cut(query))
+    tokens = _tokens(query)
     scores = _INDEX.get_scores(tokens)
 
     # 构造带分数的 (idx, score) 列表，过滤后排序

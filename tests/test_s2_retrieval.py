@@ -15,6 +15,7 @@ from src.shiwen.config import get_settings
 from src.shiwen.ingest import milvus_store, golden
 from src.shiwen.rag.bm25_store import search as bm25_search, clear_index
 from src.shiwen.rag.fusion import rrf_fuse
+from src.shiwen.rag.query_cleaner import clean_query
 from src.shiwen.rag.retriever import retrieve as vector_retrieve
 
 
@@ -37,6 +38,26 @@ def has_data(mv_client):
 @pytest.fixture(scope="module")
 def has_llm_key():
     return bool(get_settings().deepseek_api_key)
+
+
+# ===== 查询清洗测试 =====
+
+
+def test_clean_query_strips_boilerplate():
+    """考据/翻译题的提问套话应被剥掉，只留名句内核。"""
+    assert clean_query("吾日三省吾身是谁说的，出自哪一篇") == "吾日三省吾身"
+    assert clean_query("请将论语中学而时习之，不亦说乎翻译成现代汉语") == "论语中学而时习之不亦说乎"
+    assert clean_query("富贵不能淫，贫贱不能移，威武不能屈的出处") == "富贵不能淫贫贱不能移威武不能屈"
+    assert clean_query("庖丁解牛的故事出自《庄子》哪一篇") == "庖丁解牛庄子"
+
+
+def test_clean_query_keeps_semantic_core():
+    """知识题的关键词（书名/人名/术语）应保留，不被误删。"""
+    assert "道德经" in clean_query("《道德经》的作者是谁？")
+    assert "孙子兵法" in clean_query("《孙子兵法》的作者是谁？")
+    assert "无为而治" in clean_query("老子道德经中无为而治的思想如何理解？")
+    # 清洗后为空则回退原 query
+    assert clean_query("？？？") == "？？？"
 
 
 # ===== BM25 检索测试 =====
