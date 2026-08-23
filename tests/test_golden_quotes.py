@@ -51,6 +51,10 @@ def test_pg_id_consistent(client, has_data):
 
     engine = pg_store.get_engine()
     with engine.connect() as conn:
-        row = conn.execute(select(ChunkRow).where(ChunkRow.id == cid)).scalar_one_or_none()
-    assert row is not None, f"PG 中找不到同 id 记录 {cid}"
-    assert row.text == rows[0]["text"], "Milvus 与 PG 同 id 的 text 不一致"
+        # 用 select(ChunkRow.text) 显式取列：Connection.execute 不重建 ORM 实体，
+        # select(ChunkRow) 会展开为逐列原始值，scalar_one_or_none 返回首列 id(str)
+        row_text = conn.execute(
+            select(ChunkRow.text).where(ChunkRow.id == cid)
+        ).scalar_one_or_none()
+    assert row_text is not None, f"PG 中找不到同 id 记录 {cid}"
+    assert row_text == rows[0]["text"], "Milvus 与 PG 同 id 的 text 不一致"

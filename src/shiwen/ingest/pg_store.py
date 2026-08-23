@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from sqlalchemy import Integer, String, Text, create_engine, func, select
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
 from src.shiwen.config import get_settings
 from .models import Chunk
@@ -89,9 +89,14 @@ def count_book(book_id: str, engine: Engine | None = None) -> int:
 
 
 def query_book(book_id: str, limit: int = 10, engine: Engine | None = None) -> list[dict]:
+    """按 book_id 查询 chunk 记录（用 Session 以正确返回 ORM 实体）。
+
+    注意：Connection.execute(select(ChunkRow)) 不重建实体，需用 Session
+    才能拿到 ChunkRow 对象而非逐列原始值。
+    """
     engine = engine or get_engine()
-    with engine.connect() as conn:
-        rows = conn.execute(
+    with Session(engine) as session:
+        rows = session.scalars(
             select(ChunkRow).where(ChunkRow.book_id == book_id).limit(limit)
-        ).scalars().all()
+        ).all()
     return [_to_row(r) for r in rows]
