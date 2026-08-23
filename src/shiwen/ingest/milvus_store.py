@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Any
 
 from pymilvus import DataType, MilvusClient
@@ -23,7 +24,9 @@ _OUTPUT_FIELDS = [
 ]
 
 
+@lru_cache(maxsize=1)
 def _client() -> MilvusClient:
+    """Milvus Lite 客户端（进程内单例，避免频繁创建连接导致 gRPC 过载）。"""
     s = get_settings()
     return MilvusClient(uri=s.milvus_uri or s.milvus_db_path)
 

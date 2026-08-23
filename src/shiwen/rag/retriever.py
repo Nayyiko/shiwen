@@ -45,7 +45,8 @@ def _build_filter(book_id: str | None = None, category: str | None = None) -> st
 
 
 def retrieve(query: str, top_k: int = 5, book_id: str | None = None,
-             category: str | None = None) -> list[RetrievedChunk]:
+             category: str | None = None,
+             client=None) -> list[RetrievedChunk]:
     """语义检索：查询 → 向量化 → Milvus COSINE 检索 → 带元数据的 chunk 列表。
 
     参数：
@@ -53,12 +54,13 @@ def retrieve(query: str, top_k: int = 5, book_id: str | None = None,
         top_k:    返回数量（默认 5）
         book_id:  可选，限定某部书（如 "lunyu"）
         category: 可选，限定四部分类（如 "经部"）
+        client:   可选，复用已有 MilvusClient（避免 Milvus Lite 频繁创建连接）
     """
     embedder = get_embedder()
     vec = embedder.encode([query])[0]
     filter_expr = _build_filter(book_id=book_id, category=category)
 
-    hits = milvus_search(vec, top_k=top_k, filter_expr=filter_expr)
+    hits = milvus_search(vec, top_k=top_k, filter_expr=filter_expr, client=client)
 
     results: list[RetrievedChunk] = []
     for h in hits:

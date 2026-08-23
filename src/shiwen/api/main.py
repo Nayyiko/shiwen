@@ -1,8 +1,7 @@
 """FastAPI 入口：识文新裁后端 API。
 
-S2 已接入 LangGraph 检索图（研微问答）。
+S2 已接入 LangGraph 多跳检索图（三路混合检索 + RRF + grounding + 反思）。
 后续阶段接入：
-- S3    多跳闭环 + 自我反思
 - S4    先贤辩论图
 - S5    研究写作图
 - S6    新裁角色扮演图
@@ -15,7 +14,7 @@ from pydantic import BaseModel
 
 from src.shiwen.config import get_settings
 
-app = FastAPI(title="识文新裁 API", version="0.2.0")
+app = FastAPI(title="识文新裁 API", version="0.3.0")
 
 
 class ChatRequest(BaseModel):
@@ -31,9 +30,19 @@ class Citation(BaseModel):
     text: str
 
 
+class TraceEntry(BaseModel):
+    node: str
+    elapsed_ms: int
+
+
 class ChatResponse(BaseModel):
     answer: str
     citations: list[Citation]
+    rounds: int
+    grounding_pass: bool
+    grounding_reason: str | None = None
+    diagnosis: str | None = None
+    trace: list[TraceEntry]
 
 
 class SearchRequest(BaseModel):
@@ -67,7 +76,7 @@ def health() -> dict:
 
 @app.post("/api/chat")
 def chat(req: ChatRequest) -> ChatResponse:
-    """研微 RAG 问答：检索 + 生成，返回带引据的回答。"""
+    """研微 RAG 问答：三路混合检索 → RRF 融合 → 生成 → grounding 校验 → 反思多跳（≤3轮）。"""
     if not get_settings().deepseek_api_key:
         raise HTTPException(
             status_code=503,
@@ -82,11 +91,17 @@ def chat(req: ChatRequest) -> ChatResponse:
         "query": req.query,
         "book_id": req.book_id,
         "category": req.category,
+        "round": 0,
+        "max_rounds": 3,
         "chunks": [],
         "answer": "",
+        "grounding_pass": False,
+        "grounding_reason": "",
+        "diagnosis": "",
+        "rewritten_query": "",
+        "trace": [],
     })
 
-    # 从检索结果中提取引据信息
     citations: list[Citation] = []
     for c in result.get("chunks", []):
         citations.append(Citation(
@@ -96,7 +111,20 @@ def chat(req: ChatRequest) -> ChatResponse:
             text=c["text"][:200],
         ))
 
-    return ChatResponse(answer=result["answer"], citations=citations)
+    trace = [
+        TraceEntry(node=t["node"], elapsed_ms=t["elapsed_ms"])
+        for t in result.get("trace", [])
+    ]
+
+    return ChatResponse(
+        answer=result["answer"],
+        citations=citations,
+        rounds=result.get("round", 0) + 1,
+        grounding_pass=result.get("grounding_pass", False),
+        grounding_reason=result.get("grounding_reason") or None,
+        diagnosis=result.get("diagnosis") or None,
+        trace=trace,
+    )
 
 
 @app.post("/api/search")
