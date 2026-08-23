@@ -5,9 +5,10 @@ services:
       - .env
     volumes:
       - ./data:/app/data
-      # 开发免重建：src / eval 改动即时生效（生产部署仍走镜像内 COPY）
+      # 开发免重建：src / eval / tests 改动即时生效（生产部署仍走镜像内 COPY）
       - ./src:/app/src
       - ./eval:/app/eval
+      - ./tests:/app/tests
       # 缓存 BGE-M3 模型权重（约 2GB），避免每次重建镜像重下
       - hf_cache:/root/.cache/huggingface
     depends_on:

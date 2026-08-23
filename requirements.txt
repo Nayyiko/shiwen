@@ -16,3 +16,7 @@ pymilvus[milvus_lite]>=2.4.3
 langgraph>=0.4
 openai>=1.30
 sentence-transformers>=2.7
+
+# 测试
+pytest>=8.0
+httpx>=0.27  # FastAPI TestClient 依赖

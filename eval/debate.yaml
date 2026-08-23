@@ -1,0 +1,34 @@
+# S4 先贤辩论 评测集：5 个辩题（交付文档 F4 验收）
+# 每个辩题标注 expected_sages（前两位应发言的先贤），验证紧急度路由正确性
+# 论据引用率由实跑检测（发言引用 chunk 的 book 是否属于该先贤著作）
+
+debate_topics:
+  - id: D001
+    topic: "德治与法治：哪个更适合治国？"
+    description: "儒家德治 vs 法家法治的经典辩题"
+    expected_sages: ["kongzi", "hanfei"]
+    expected_schools: ["儒家", "法家"]
+
+  - id: D002
+    topic: "人性本善还是本恶？"
+    description: "孟子性善论 vs 韩非人性好利恶害"
+    expected_sages: ["mengzi", "hanfei"]
+    expected_schools: ["儒家", "法家"]
+
+  - id: D003
+    topic: "义利之辨：君子应该重义轻利，还是义利可以兼顾？"
+    description: "孔孟义利观 vs 韩非功利主义"
+    expected_sages: ["kongzi", "mengzi"]
+    expected_schools: ["儒家"]
+
+  - id: D004
+    topic: "无为而治：在当今社会是否可行？"
+    description: "老子无为 vs 儒家有为"
+    expected_sages: ["laozi", "kongzi"]
+    expected_schools: ["道家", "儒家"]
+
+  - id: D005
+    topic: "王道与霸道：以仁服人还是以力服人？"
+    description: "孟子王道 vs 韩非霸道"
+    expected_sages: ["mengzi", "hanfei"]
+    expected_schools: ["儒家", "法家"]
