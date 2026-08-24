@@ -6,9 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 COPY requirements.txt .
-# 先装 CPU 版 torch：PyPI 默认 Linux torch 会连带拉取 CUDA 全家桶(~10GB)，本机/服务器都用不上 GPU
-RUN pip install --no-cache-dir "torch==2.13.0+cpu" --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://mirrors.aliyun.com/pypi/simple/
-# 国内 PyPI 镜像加速其余依赖（sentence-transformers 复用已装的 CPU torch，跳过 CUDA 版）
+# 服务器走 Cloudflare API embedding，不装本地模型（torch/sentence-transformers 已移入 requirements-local.txt），
+# 避免 2G 内存小服务器 build 时 OOM。国内 PyPI 镜像加速其余依赖。
 RUN pip install --no-cache-dir -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
 
 COPY src ./src

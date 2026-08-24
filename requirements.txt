@@ -15,7 +15,8 @@ pymilvus[milvus_lite]>=2.4.3
 # S2/S3 RAG 检索图 + LLM
 langgraph>=0.4
 openai>=1.30
-sentence-transformers>=2.7
+# 注意：sentence-transformers（本地 BGE-M3）已移入 requirements-local.txt，
+# 服务器走 Cloudflare API embedding，不需要本地模型，避免 torch 拖垮 2G 内存。
 
 # S8 MCP 工具层
 fastmcp>=3.0

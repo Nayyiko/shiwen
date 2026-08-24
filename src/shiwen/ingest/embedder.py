@@ -46,7 +46,13 @@ class Embedder:
             if get_settings().hf_endpoint:  # 国内下载权重可走 hf-mirror
                 os.environ.setdefault("HF_ENDPOINT", get_settings().hf_endpoint)
 
-            from sentence_transformers import SentenceTransformer
+            try:
+                from sentence_transformers import SentenceTransformer
+            except ImportError as e:
+                raise RuntimeError(
+                    "未安装 sentence-transformers。服务器请改用 EMBEDDING_PROVIDER=cloudflare（走 API，"
+                    "不占本地内存）；本地开发请 pip install -r requirements-local.txt。"
+                ) from e
 
             self._model = SentenceTransformer(self.model_name, device=self.device)
         return self._model
