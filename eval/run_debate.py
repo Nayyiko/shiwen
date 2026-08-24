@@ -123,6 +123,9 @@ def evaluate(limit: int | None = None) -> dict:
               f"drift={len(drift_events)} "
               f"{elapsed:.1f}s")
 
+        CHECKPOINT.write_text(json.dumps(
+            {"results": results}, ensure_ascii=False, indent=2), encoding="utf-8")
+
     n = len(results)
     metrics = {
         "total_topics": n,
