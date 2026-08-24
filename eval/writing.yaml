@@ -1,0 +1,21 @@
+# S5 研究写作 评测集：3 个选题（交付文档 F2 验收）
+# 每个选题标注 expected_books（引据应来自的书目），验证引据可回溯率与书目覆盖率
+
+writing_topics:
+  - id: W001
+    topic: "《论语》中的仁学思想"
+    description: "分析论语中仁的核心内涵、实践路径与当代意义"
+    expected_books: ["lunyu"]
+    min_sections: 3
+
+  - id: W002
+    topic: "《孙子兵法》的战略思想"
+    description: "分析孙子兵法中'不战而屈人之兵'、'知己知彼'等核心战略思想"
+    expected_books: ["sunzi"]
+    min_sections: 3
+
+  - id: W003
+    topic: "《道德经》中的无为思想"
+    description: "分析道德经中无为的内涵、政治哲学意义与当代启示"
+    expected_books: ["daodejing"]
+    min_sections: 3

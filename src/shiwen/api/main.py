@@ -2,8 +2,8 @@
 
 S2 已接入 LangGraph 多跳检索图（三路混合检索 + RRF + grounding + 反思）。
 后续阶段接入：
-- S4    先贤辩论图
-- S5    研究写作图
+- S4    先贤辩论图 ✅
+- S5    研究写作图 ✅
 - S6    新裁角色扮演图
 """
 
@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 from src.shiwen.config import get_settings
 
-app = FastAPI(title="识文新裁 API", version="0.4.0")
+app = FastAPI(title="识文新裁 API", version="0.5.0")
 
 
 class ChatRequest(BaseModel):
@@ -75,6 +75,25 @@ class DebateResponse(BaseModel):
     summary: str
     urgency_trace: list[dict]
     drift_events: list[dict]
+    trace: list[TraceEntry]
+
+
+class WriteRequest(BaseModel):
+    topic: str
+    max_sections: int = 4
+
+
+class WriteSection(BaseModel):
+    title: str
+    text: str
+    citations_count: int
+
+
+class WriteResponse(BaseModel):
+    topic: str
+    sections: list[WriteSection]
+    article: str
+    citations: list[Citation]
     trace: list[TraceEntry]
 
 
@@ -243,5 +262,62 @@ def debate(req: DebateRequest) -> DebateResponse:
         summary=result.get("summary", ""),
         urgency_trace=result.get("urgency_trace", []),
         drift_events=result.get("drift_events", []),
+        trace=trace,
+    )
+
+
+@app.post("/api/write")
+def write(req: WriteRequest) -> WriteResponse:
+    """研究写作：选题→大纲→逐节检索→逐节写作→综合润色。
+
+    S5 Writing Graph：LangGraph 状态图，可断点续写。
+    """
+    if not get_settings().deepseek_api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="DEEPSEEK_API_KEY 未配置，请在 .env 中填入 DeepSeek API Key。",
+        )
+
+    from src.shiwen.writing.graph import build_writing_graph
+
+    graph = build_writing_graph()
+    result = graph.invoke({
+        "topic": req.topic,
+        "max_sections": req.max_sections,
+        "outline": [],
+        "section_index": 0,
+        "all_chunks": [],
+        "article": "",
+        "trace": [],
+    })
+
+    sections: list[WriteSection] = []
+    for sec in result.get("outline", []):
+        sections.append(WriteSection(
+            title=sec.get("title", ""),
+            text=sec.get("text", ""),
+            citations_count=len(sec.get("chunks", [])),
+        ))
+
+    citations = [
+        Citation(
+            book=c.get("book", ""),
+            chapter=c.get("chapter", ""),
+            version=c.get("version", ""),
+            text=c.get("text", "")[:200],
+        )
+        for c in result.get("all_chunks", [])[:10]
+    ]
+
+    trace = [
+        TraceEntry(node=t["node"], elapsed_ms=t.get("elapsed_ms", 0))
+        for t in result.get("trace", [])
+    ]
+
+    return WriteResponse(
+        topic=req.topic,
+        sections=sections,
+        article=result.get("article", ""),
+        citations=citations,
         trace=trace,
     )
