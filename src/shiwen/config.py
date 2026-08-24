@@ -17,11 +17,15 @@ class Settings(BaseSettings):
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
 
-    # Embedding（local_bge_m3 / api）
+    # Embedding（local_bge_m3 / api / cloudflare）
     embedding_provider: str = "local_bge_m3"
     embedding_api_key: str = ""
     embedding_base_url: str = ""
     embedding_model: str = "BAAI/bge-m3"
+    # Cloudflare Workers AI（@cf/baai/bge-m3，与 HF BAAI/bge-m3 同款 1024 维）
+    cloudflare_account_id: str = ""
+    cloudflare_auth_token: str = ""
+    cloudflare_embedding_model: str = "@cf/baai/bge-m3"
 
     # PostgreSQL（docker-compose 内建）
     postgres_host: str = "postgres"

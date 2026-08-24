@@ -24,6 +24,10 @@ data/corpus/*
 data/milvus.db
 data/*.db
 
+# 打包产物（部署用 tar）
+shiwen-data/
+shiwen-data.tar.gz
+
 # ===== 评测产物（由评测脚本生成）=====
 eval/report.md
 eval/results.json
