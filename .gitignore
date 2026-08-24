@@ -38,6 +38,10 @@ eval/writing_results.json
 eval/report_roleplay.md
 eval/roleplay_results.json
 eval/report_all.md
+eval/report_baiJia.md
+eval/baiJia_results.json
+eval/report_token_save.md
+eval/token_save_results.json
 
 # ===== 前端 =====
 node_modules/
