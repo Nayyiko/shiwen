@@ -8,11 +8,63 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-from sqlalchemy import ForeignKey, Integer, String, Text
+from sqlalchemy import ForeignKey, Integer, String, Text, select
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from .pg_store import Base, get_engine
+
+
+def query_person(name_or_id: str, engine: Engine | None = None) -> dict | None:
+    """按姓名或 ID 查询人物关系。
+
+    返回：{
+        "person": {...},
+        "works": [...],
+        "relations": [...],
+    }
+    """
+    engine = engine or get_engine()
+    with Session(engine) as session:
+        # 优先按 id 查，再按 name 查
+        person = session.scalar(select(Person).where(Person.id == name_or_id))
+        if not person:
+            person = session.scalar(select(Person).where(Person.name == name_or_id))
+        if not person:
+            return None
+
+        works = session.scalars(
+            select(PersonWork).where(PersonWork.person_id == person.id)
+        ).all()
+        relations = session.scalars(
+            select(PersonRelation).where(PersonRelation.person_id == person.id)
+        ).all()
+
+        return {
+            "person": {
+                "id": person.id,
+                "name": person.name,
+                "courtesy": person.courtesy,
+                "dynasty": person.dynasty,
+                "school": person.school,
+                "notes": person.notes,
+            },
+            "works": [
+                {"title": w.work_title, "relation": w.relation, "note": w.note}
+                for w in works
+            ],
+            "relations": [
+                {
+                    "target_id": r.target_person_id,
+                    "target_name": session.scalar(
+                        select(Person.name).where(Person.id == r.target_person_id)
+                    ) or r.target_person_id,
+                    "relation": r.relation,
+                    "note": r.note,
+                }
+                for r in relations
+            ],
+        }
 
 
 class Person(Base):
