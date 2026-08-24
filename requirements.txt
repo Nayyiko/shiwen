@@ -21,6 +21,9 @@ openai>=1.30
 # S8 MCP 工具层
 fastmcp>=3.0
 
+# 会话状态 / 分层记忆 / 断点恢复
+redis>=5.0
+
 # 测试
 pytest>=8.0
 httpx>=0.27  # FastAPI TestClient 依赖

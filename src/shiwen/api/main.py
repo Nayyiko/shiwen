@@ -101,6 +101,7 @@ class RoleplayRequest(BaseModel):
     sage_id: str          # kongzi / mengzi / laozi / hanfei
     message: str          # 用户当前消息
     history: list[dict] | None = None  # 对话历史 [{role, content}, ...]
+    session_id: str | None = None      # 会话 ID：提供则服务端 Redis 持久化历史，支持断点恢复
 
 
 class RoleplayResponse(BaseModel):
@@ -352,6 +353,7 @@ def roleplay(req: RoleplayRequest) -> RoleplayResponse:
         )
 
     from src.shiwen.agents.personas import SAGES
+    from src.shiwen.memory import MemoryManager
     from src.shiwen.roleplay.graph import build_roleplay_graph
 
     persona = SAGES.get(req.sage_id)
@@ -361,15 +363,30 @@ def roleplay(req: RoleplayRequest) -> RoleplayResponse:
             detail=f"未知先贤 ID：{req.sage_id}。可用：{', '.join(SAGES.keys())}",
         )
 
+    # 分层记忆：session_id 提供时从 Redis 读短期对话历史（断点恢复），否则用调用方传入 history
+    memory = MemoryManager()
+    history = req.history or []
+    if req.session_id:
+        stored = memory.get_recent_messages(req.session_id, n=20)
+        if stored:
+            history = stored
+
     graph = build_roleplay_graph()
     result = graph.invoke({
         "sage_id": req.sage_id,
         "user_message": req.message,
-        "history": req.history or [],
+        "history": history,
         "chunks": [],
         "response": "",
         "trace": [],
     })
+
+    response = result.get("response", "")
+
+    # 状态持久化：把本轮对话写入短期记忆（session_id 提供时），支持下次请求断点恢复
+    if req.session_id:
+        memory.append_message(req.session_id, "user", req.message)
+        memory.append_message(req.session_id, "assistant", response)
 
     citations = [
         Citation(
@@ -390,7 +407,7 @@ def roleplay(req: RoleplayRequest) -> RoleplayResponse:
         sage_id=req.sage_id,
         sage_name=persona.name,
         school=persona.school,
-        response=result.get("response", ""),
+        response=response,
         citations=citations,
         trace=trace,
     )

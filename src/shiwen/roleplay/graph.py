@@ -63,18 +63,25 @@ def _generate_node(state: RoleplayState) -> dict:
     s = get_settings()
     client = OpenAI(api_key=s.deepseek_api_key, base_url=s.deepseek_base_url)
 
+    # 上下文治理：token 预算跟踪 + 动态裁剪窗口 + 检索上下文压缩
+    from src.shiwen.context import build_prompt_budget
+
+    budget = build_prompt_budget(
+        state.get("history", []),
+        state.get("chunks", []),
+    )
+    history = budget["history"]
+    chunks = budget["chunks"]
+
     # 历史上下文
     history_text = ""
-    history = state.get("history", [])
     if history:
-        recent = history[-6:]  # 最近 6 轮
         history_text = "\n".join(
             f"【{'用户' if h['role'] == 'user' else persona.name}】{h['content'][:300]}"
-            for h in recent
+            for h in history
         )
 
     # 检索资料
-    chunks = state.get("chunks", [])
     chunks_text = "\n\n".join(
         f"[{i}] {c['text'][:300]}\n    出处：{c['book']}·{c['chapter']}（{c['version']}）"
         for i, c in enumerate(chunks, 1)

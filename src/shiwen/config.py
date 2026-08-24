@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     # 可选：覆盖为 standalone Milvus 地址（如 http://host:19530），未来换真 Milvus 只改配置不改代码
     milvus_uri: str = ""
 
+    # Redis（会话状态 / 分层记忆 / 断点恢复）
+    redis_host: str = "redis"
+    redis_port: int = 6379
+    redis_db: int = 0
+    redis_enabled: bool = True  # False 时降级为进程内存储（本地无 Redis 可跑）
+
     # 语料下载 base URL（可选，覆盖 manifest source_base；国内可配镜像）
     corpus_raw_base: str = ""
     # HuggingFace 镜像端点（国内下载 BGE-M3 权重用，如 https://hf-mirror.com）

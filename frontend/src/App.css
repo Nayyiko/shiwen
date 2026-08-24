@@ -1,42 +1,44 @@
 .container {
-  max-width: 720px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 32px 24px 64px;
 }
 
 .tagline {
   color: #555;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
-.modules {
+/* ── 导航 tab ── */
+.tabs {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
-.card {
-  flex: 1 1 180px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.card h2 {
-  margin: 0 0 8px;
-}
-
-.card p {
-  margin: 0;
-  color: #555;
+.tabs button {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
   font-size: 14px;
 }
 
+.tabs button.active {
+  background: #8b5a2b;
+  border-color: #8b5a2b;
+  color: #fff;
+}
+
+/* ── 输入框 ── */
 .chat {
   display: flex;
   gap: 8px;
   align-items: center;
+  margin-bottom: 16px;
 }
 
 .chat input {
@@ -57,10 +59,183 @@
   font-size: 14px;
 }
 
-.reply {
+.chat button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #c0392b;
+  font-size: 14px;
+}
+
+/* ── 问答 ── */
+.answer {
   margin-top: 16px;
-  padding: 12px;
+  padding: 16px;
   background: #f7f3ec;
-  border-radius: 6px;
+  border-radius: 8px;
+}
+
+.answer-text {
   color: #333;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.citations {
+  margin-top: 12px;
+  border-top: 1px solid #e0d8c8;
+  padding-top: 12px;
+}
+
+.citations h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #8b5a2b;
+}
+
+.citations ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.citations li {
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #555;
+}
+
+.citations li span {
+  display: block;
+  color: #777;
+  margin-top: 2px;
+}
+
+/* ── 写作 ── */
+.article {
+  margin-top: 16px;
+  padding: 20px;
+  background: #f7f3ec;
+  border-radius: 8px;
+}
+
+.article-body h2 {
+  font-size: 18px;
+  color: #333;
+  margin: 16px 0 8px;
+}
+
+.article-body p {
+  line-height: 1.8;
+  color: #333;
+}
+
+/* ── 角色扮演 ── */
+.sage-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.sage-picker button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.sage-picker button.active {
+  background: #8b5a2b;
+  border-color: #8b5a2b;
+  color: #fff;
+}
+
+.conversation {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.msg-user,
+.msg-sage {
+  padding: 10px 14px;
+  border-radius: 8px;
+  line-height: 1.6;
+  max-width: 85%;
+}
+
+.msg-user {
+  align-self: flex-end;
+  background: #e8f0fe;
+  color: #1a3a5c;
+}
+
+.msg-sage {
+  align-self: flex-start;
+  background: #f7f3ec;
+  color: #333;
+}
+
+/* ── 辩论 ── */
+.debate {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.speech {
+  padding: 14px;
+  background: #f7f3ec;
+  border-radius: 8px;
+}
+
+.speech-head {
+  font-size: 14px;
+  color: #8b5a2b;
+  margin-bottom: 6px;
+}
+
+.speech p {
+  line-height: 1.7;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.speech-citations {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.speech-citations span {
+  font-size: 12px;
+  color: #777;
+  background: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.debate-summary {
+  padding: 14px;
+  background: #f0e6d2;
+  border-radius: 8px;
+}
+
+.debate-summary h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #8b5a2b;
+}
+
+.debate-summary p {
+  line-height: 1.7;
+  color: #333;
+  margin: 0;
 }
