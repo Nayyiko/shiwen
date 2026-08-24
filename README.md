@@ -129,7 +129,7 @@ gh secret set ECS_SSH_KEY -b"$(cat ~/.ssh/id_rsa)"
 - [x] S5 研究写作
 - [x] S6 新裁角色扮演
 - [x] S7 评测与可观测
-- [ ] S8 MCP 工具层
+- [x] S8 MCP 工具层
 - [ ] S9 阿里云部署（线上试用版）
 
 ## License
