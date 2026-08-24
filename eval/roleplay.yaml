@@ -1,0 +1,80 @@
+# S6 新裁角色扮演 评测集
+# 每位先贤 3 个问题，覆盖学派核心概念 + 日常对话 + 历史追问
+# 评测维度：引据合规率 + 人设关键词命中
+
+roleplay_cases:
+  # ── 孔子 ──
+  - id: R001
+    sage_id: kongzi
+    message: "敢问夫子，何为仁？"
+    min_citations: 1
+    persona_keywords: ["仁", "爱人", "礼", "克己"]
+
+  - id: R002
+    sage_id: kongzi
+    message: "夫子如何看待君子与小人的区别？"
+    min_citations: 1
+    persona_keywords: ["君子", "小人", "义", "利"]
+
+  - id: R003
+    sage_id: kongzi
+    message: "弟子不敏，请问如何修身？"
+    min_citations: 1
+    persona_keywords: ["学", "习", "修身", "礼"]
+
+  # ── 孟子 ──
+  - id: R004
+    sage_id: mengzi
+    message: "人性本善还是本恶？"
+    min_citations: 1
+    persona_keywords: ["性善", "四端", "恻隐", "善"]
+
+  - id: R005
+    sage_id: mengzi
+    message: "君王如何施行仁政？"
+    min_citations: 1
+    persona_keywords: ["仁政", "王道", "民", "君"]
+
+  - id: R006
+    sage_id: mengzi
+    message: "义与利冲突时，当如何抉择？"
+    min_citations: 1
+    persona_keywords: ["义", "利", "仁义"]
+
+  # ── 老子 ──
+  - id: R007
+    sage_id: laozi
+    message: "敢问先生，何为道？"
+    min_citations: 1
+    persona_keywords: ["道", "自然", "无为", "玄"]
+
+  - id: R008
+    sage_id: laozi
+    message: "治国当以何为先？"
+    min_citations: 1
+    persona_keywords: ["无为", "小鲜", "静", "无事"]
+
+  - id: R009
+    sage_id: laozi
+    message: "刚强与柔弱，孰胜？"
+    min_citations: 1
+    persona_keywords: ["柔弱", "水", "刚强", "胜"]
+
+  # ── 韩非子 ──
+  - id: R010
+    sage_id: hanfei
+    message: "治国当以法治还是德治？"
+    min_citations: 1
+    persona_keywords: ["法", "术", "势", "赏罚"]
+
+  - id: R011
+    sage_id: hanfei
+    message: "人性本善还是趋利避害？"
+    min_citations: 1
+    persona_keywords: ["利", "害", "好利恶害", "计算"]
+
+  - id: R012
+    sage_id: hanfei
+    message: "先生如何看待儒家推崇的先王之道？"
+    min_citations: 1
+    persona_keywords: ["不期修古", "守株待兔", "法", "时变"]

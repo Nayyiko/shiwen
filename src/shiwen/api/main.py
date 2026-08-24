@@ -4,7 +4,7 @@ S2 已接入 LangGraph 多跳检索图（三路混合检索 + RRF + grounding + 
 后续阶段接入：
 - S4    先贤辩论图 ✅
 - S5    研究写作图 ✅
-- S6    新裁角色扮演图
+- S6    新裁角色扮演图 ✅
 """
 
 from __future__ import annotations
@@ -93,6 +93,21 @@ class WriteResponse(BaseModel):
     topic: str
     sections: list[WriteSection]
     article: str
+    citations: list[Citation]
+    trace: list[TraceEntry]
+
+
+class RoleplayRequest(BaseModel):
+    sage_id: str          # kongzi / mengzi / laozi / hanfei
+    message: str          # 用户当前消息
+    history: list[dict] | None = None  # 对话历史 [{role, content}, ...]
+
+
+class RoleplayResponse(BaseModel):
+    sage_id: str
+    sage_name: str
+    school: str
+    response: str
     citations: list[Citation]
     trace: list[TraceEntry]
 
@@ -318,6 +333,64 @@ def write(req: WriteRequest) -> WriteResponse:
         topic=req.topic,
         sections=sections,
         article=result.get("article", ""),
+        citations=citations,
+        trace=trace,
+    )
+
+
+@app.post("/api/roleplay")
+def roleplay(req: RoleplayRequest) -> RoleplayResponse:
+    """新裁角色扮演：1v1 与指定先贤对话，沉浸式叙事。
+
+    S6 Roleplay Graph：检索先贤著作 → 人设生成回复。
+    多轮对话由调用方传 history 驱动。
+    """
+    if not get_settings().deepseek_api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="DEEPSEEK_API_KEY 未配置，请在 .env 中填入 DeepSeek API Key。",
+        )
+
+    from src.shiwen.agents.personas import SAGES
+    from src.shiwen.roleplay.graph import build_roleplay_graph
+
+    persona = SAGES.get(req.sage_id)
+    if persona is None:
+        raise HTTPException(
+            status_code=400,
+            detail=f"未知先贤 ID：{req.sage_id}。可用：{', '.join(SAGES.keys())}",
+        )
+
+    graph = build_roleplay_graph()
+    result = graph.invoke({
+        "sage_id": req.sage_id,
+        "user_message": req.message,
+        "history": req.history or [],
+        "chunks": [],
+        "response": "",
+        "trace": [],
+    })
+
+    citations = [
+        Citation(
+            book=c.get("book", ""),
+            chapter=c.get("chapter", ""),
+            version=c.get("version", ""),
+            text=c.get("text", "")[:200],
+        )
+        for c in result.get("chunks", [])
+    ]
+
+    trace = [
+        TraceEntry(node=t["node"], elapsed_ms=t.get("elapsed_ms", 0))
+        for t in result.get("trace", [])
+    ]
+
+    return RoleplayResponse(
+        sage_id=req.sage_id,
+        sage_name=persona.name,
+        school=persona.school,
+        response=result.get("response", ""),
         citations=citations,
         trace=trace,
     )

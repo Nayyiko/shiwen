@@ -31,6 +31,8 @@ eval/report_debate.md
 eval/debate_results.json
 eval/report_writing.md
 eval/writing_results.json
+eval/report_roleplay.md
+eval/roleplay_results.json
 
 # ===== 前端 =====
 node_modules/
