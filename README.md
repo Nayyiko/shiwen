@@ -123,10 +123,10 @@ gh secret set ECS_SSH_KEY -b"$(cat ~/.ssh/id_rsa)"
 
 - [x] S0 环境 / 建仓 / docker-compose / CI/CD
 - [x] S1 语料 + Ingestion（含人物关系表）
-- [ ] S2 检索单跳
-- [ ] S3 多跳闭环 + 自我反思
-- [ ] S4 先贤辩论
-- [ ] S5 研究写作
+- [x] S2 检索单跳
+- [x] S3 多跳闭环 + 自我反思
+- [x] S4 先贤辩论
+- [x] S5 研究写作
 - [ ] S6 新裁角色扮演
 - [ ] S7 评测与可观测
 - [ ] S8 MCP 工具层
