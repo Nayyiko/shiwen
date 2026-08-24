@@ -105,7 +105,7 @@ def compute_s4_metrics(results: list[dict]) -> dict[str, float]:
     return {
         "routing_accuracy": round(routing, 4),
         "citation_compliance": round(citation, 4),
-        "total_drift_events": float(total_drift),
+        "total_drift_events": int(total_drift),
         "avg_elapsed_s": round(avg_elapsed, 1),
     }
 

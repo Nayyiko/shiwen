@@ -131,4 +131,7 @@ def format_value(v: float, unit: str) -> str:
         return f"{v:.0%}"
     if unit == "s":
         return f"{v:.1f}s"
+    # 整数值（如漂移事件数、轮数）显示为整数，避免 "0.000"
+    if isinstance(v, (int, float)) and float(v).is_integer():
+        return str(int(v))
     return f"{v:.3f}"
