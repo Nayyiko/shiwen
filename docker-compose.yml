@@ -21,11 +21,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    # 2G 小内存服务器：硬上限 700MB，防单个容器内存失控拖垮内核（上次整机 OOM 重启的教训）
+    mem_limit: 700m
     restart: unless-stopped
     # 不映射公网端口；由 nginx 反代 /api
 
   postgres:
     image: postgres:16-alpine
+    # 2G 小内存服务器：调低 shared_buffers 省内存
+    command: ["postgres", "-c", "shared_buffers=32MB", "-c", "max_connections=50"]
+    mem_limit: 256m
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-shiwen}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
@@ -43,6 +48,7 @@ services:
     image: redis:7-alpine
     # 会话状态/分层记忆/断点恢复的存储；2G 小内存服务器限 64MB 上限防 OOM
     command: ["redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
+    mem_limit: 128m
     volumes:
       - redis_data:/data
     healthcheck:
@@ -64,6 +70,7 @@ services:
       # - "8443:443"  # HTTPS 证书后置（暂未启用）
     depends_on:
       - backend
+    mem_limit: 64m
     restart: unless-stopped
 
 volumes:
